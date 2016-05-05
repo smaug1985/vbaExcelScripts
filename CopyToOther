@@ -1,0 +1,46 @@
+
+Dim wb1 As Workbook
+Dim wb2 As Workbook
+
+Set wb1 = ActiveWorkbook
+sFolder = "Path/To/destiny" ' Ruta donde se guardan los excels a copiar, IMPORTANTE que tenga la contrabarra (\) final
+originStartRow = 5 ' En las hojas de origen, la fila donde empiezan los datos
+destinySheetIndex = 1 ' La hoja destino del documento final
+startDestinyRow = 2 ' La primera fila donde comienzan a pegarse los datos
+
+Set FSO = CreateObject("Scripting.FileSystemObject")
+
+If Not FSO.FolderExists(sFolder) Then
+MsgBox folder & "Specified Folder Not Found", vbInformation, "Not Found!"
+End If
+Set objFolder = FSO.GetFolder(sFolder)
+
+
+
+For Each objFile In objFolder.Files
+    'print file name
+    
+    Set wb2 = Workbooks.Open(objFile.Path)
+    startRow = originStartRow
+    endRow = originStartRow
+    
+    
+    Set ws = wb2.Sheets(1)
+   
+    i = startRow
+    While Not IsEmpty(ws.Cells(i, 1).Value)
+     i = i + 1
+    Wend
+    endRow = i
+    Set destinySheet = wb1.Sheets(destinySheetIndex)
+    
+    ws.Range("A" & startRow & ":N" & i).Copy (destinySheet.Range("A" & startDestinyRow))
+    MsgBox startDestinyRow & ":" & endRow & ":" & startRow
+    startDestinyRow = startDestinyRow + (endRow - startRow)
+    
+    
+    
+    
+    wb2.Close
+    
+    Next objFile
